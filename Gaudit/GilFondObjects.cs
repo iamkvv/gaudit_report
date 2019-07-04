@@ -272,5 +272,32 @@ namespace Gaudit
 
 
         }
+
+        private void btnDeletePorch_Click(object sender, EventArgs e)
+        {
+
+            if (MessageBox.Show("Удалить данные подъездов?",
+                                    "Подъезды",
+                                     MessageBoxButtons.YesNo) == DialogResult.Yes)
+            {
+                porchAdapter.DeleteSelectedPorch(this.currPorchID);
+
+                if (grdPorch.CurrentRow != null)
+                {
+                    this.currPorchID = (int)grdPorch.CurrentRow.Cells[0].Value;
+                    lblCurrPorch.Text = this.currPorchID.ToString();
+
+                    grdPorch.DataSource = porchAdapter.GetDataBySelectObject(this.currObjID);
+                    grdPomesch.DataSource = pomeschAdapter.GetDataBySelectedPorch(this.currPorchID);
+                }
+
+
+            }
+        }
+
+        private void btnDelete_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }

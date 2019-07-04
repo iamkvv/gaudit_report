@@ -35,13 +35,17 @@ namespace Gaudit
         DogUpravlTableAdapter dogUprAdapter;
 
         LicenseTableAdapter licenseAdapter;
-
         LicenseHousesTableAdapter lichouseAdapter;
 
         PerechRabUslugTableAdapter rabuslAdapter;
 
         qrLicSchet_PlatDocsTableAdapter qrLSPlatDocsAdapter;
+        PriborTableAdapter priborAdapter;
 
+        UstavHouseTableAdapter ustavHouseAdapter;
+
+
+        CompaniesTableAdapter companiesAdapter;
 
         List<repElHouse> repElHouses = new List<repElHouse>();
         List<repGilFondObj> repGFObj = new List<repGilFondObj>();
@@ -73,6 +77,13 @@ namespace Gaudit
             rabuslAdapter = new PerechRabUslugTableAdapter();
 
             qrLSPlatDocsAdapter = new qrLicSchet_PlatDocsTableAdapter();
+
+            priborAdapter = new PriborTableAdapter();
+
+            ustavHouseAdapter = new UstavHouseTableAdapter();
+
+            companiesAdapter = new CompaniesTableAdapter();
+
         }
 
         private void btnAddAudit_Click(object sender, EventArgs e)
@@ -159,8 +170,6 @@ namespace Gaudit
         private void btnStartAudit_Click(object sender, EventArgs e)
         {//фиксируем активный аудит
 
-            if (DateTime.Now.Month == 7 && DateTime.Now.Day >= 2)
-                return;
 
             if (dataSet1.Audit.Rows[grdSelectAudit.CurrentRow.Index] != null)
             {
@@ -168,6 +177,7 @@ namespace Gaudit
                 ActiveAudit.ID = curraud.ID_Audit;
                 ActiveAudit.ID_Company = curraud.ID_Company;
                 ActiveAudit.Company = curraud.Company;
+
                 ActiveAudit.Date = curraud.DateTime;
                 ActiveAudit.Name = curraud.AuditName;
 
@@ -191,156 +201,238 @@ namespace Gaudit
         //ОТЧЕТ
         private void btnReport_Click(object sender, EventArgs e)
         {
-            elHouseAdapter.FillByActiveAudit(ds.ElHouse, ActiveAudit.ID, ActiveAudit.ID_Company);
-            elHouseParamAdapter.Fill(ds.ElHouseParams);
 
-            gfObjectsAdapter.FillByActiveAudit(ds.GilFondObject, ActiveAudit.ID, ActiveAudit.ID_Company);
-            porchAdapter.Fill(ds.PorchGilFondОbjects);
-            pomeschAdapter.Fill(ds.PomeschGilFondОbs);
-
-            qrLSPlatDocsAdapter.Fill(ds.qrLicSchet_PlatDocs, ActiveAudit.ID, ActiveAudit.ID_Company); //query LS -> PlatDocs
-
-
-            repElHouses.Clear();
-            repGFObj.Clear();
-
-
-            //   Microsoft.Reporting.WinForms.ReportDataSource rds = new Microsoft.Reporting.WinForms.ReportDataSource();
-
-
-            /*
-            Regex rgx = new Regex(@"^(?<=)\d{1,2}\.\s");   //@"^(?<=)\d{1,2}\.\s|^(?<=)\d{1,2}\.\d{1,2}\.");   //<-так точнее //^(?<=)\d{1,2}\.\s
-            foreach (DataSet1.ElHouseRow rowHouse in ds.ElHouse.Rows)
+            Cursor.Current = Cursors.WaitCursor;
+            try
             {
-                DataSet1.ElHouseParamsRow[] paramsArr = (DataSet1.ElHouseParamsRow[])rowHouse.GetChildRows("ElHouseElHouseParams");
-                DataSet1.ElHouseParamsRow[] fltArr = (DataSet1.ElHouseParamsRow[])paramsArr.Where(p => !rgx.IsMatch(p.Param)).ToArray(); //отрезаем типа "3. "
+                ds.AcceptChanges();
 
-                fltArr = (DataSet1.ElHouseParamsRow[])paramsArr.Where(p => !p.Param.Contains("в том числе")).ToArray(); //и в том числе
+                licenseAdapter.FillByActiveAudit(ds.License, ActiveAudit.ID, ActiveAudit.ID_Company);
 
-                int qemptyPars = fltArr.Where(p => p.ParamValue != "").Count();
+                elHouseAdapter.FillByActiveAudit(ds.ElHouse, ActiveAudit.ID, ActiveAudit.ID_Company);
+                elHouseParamAdapter.Fill(ds.ElHouseParams);
 
-                repElHouses.Add(new repElHouse
+                gfObjectsAdapter.FillByActiveAudit(ds.GilFondObject, ActiveAudit.ID, ActiveAudit.ID_Company);
+                porchAdapter.Fill(ds.PorchGilFondОbjects);
+                pomeschAdapter.Fill(ds.PomeschGilFondОbs);
+
+                qrLSPlatDocsAdapter.Fill(ds.qrLicSchet_PlatDocs, ActiveAudit.ID, ActiveAudit.ID_Company); //query LS -> PlatDocs
+
+                lichouseAdapter.FillByActiveAudit(ds.LicenseHouses, ActiveAudit.ID, ActiveAudit.ID_Company);
+                DataSet1.LicenseHousesRow[] licHouseArr = ds.LicenseHouses.ToArray(); //Дома по лицензии
+
+                dogUprAdapter.FillByActiveAudit(ds.DogUpravl, ActiveAudit.ID, ActiveAudit.ID_Company); //договоры упр
+                DataSet1.DogUpravlRow[] doguprArr = ds.DogUpravl.ToArray();  //Дома по договорам
+
+                companiesAdapter.Fill(ds.Companies);
+
+                //Сравниваем дома в договорах управления и лицензиях - ОТЛОЖЕНО
+                /*
+               /// повтор вызов приводит к ошибке dogUprAdapter.FillByActiveAudit(ds.DogUpravl, ActiveAudit.ID, ActiveAudit.ID_Company); //договоры упр
+                string[] dogupr_Arr = ds.DogUpravl.Select(d => d.Управляемые_объекты).ToArray();
+               /// повтор вызов приводит к ошибке  lichouseAdapter.FillByActiveAudit(ds.LicenseHouses, ActiveAudit.ID, ActiveAudit.ID_Company);
+                string[] licHouse_Arr = ds.LicenseHouses.Select(d => d.Адрес).ToArray();
+                  */
+
+                priborAdapter.FillByActiveAudit(ds.Pribor, ActiveAudit.ID, ActiveAudit.ID_Company);
+                DataSet1.PriborRow[] priborArr = ds.Pribor.ToArray();
+
+                /////////////////
+                //repElHouses.Clear();
+
+                repGFObj.Clear();
+
+                /* эл паспорт отменен
+                Regex rgx = new Regex(@"^(?<=)\d{1,2}\.\s");   //@"^(?<=)\d{1,2}\.\s|^(?<=)\d{1,2}\.\d{1,2}\.");   //<-так точнее //^(?<=)\d{1,2}\.\s
+                foreach (DataSet1.ElHouseRow rowHouse in ds.ElHouse.Rows)
                 {
-                    ID = rowHouse.ID_ElHouse,
-                    Address = rowHouse.Адрес_дома,
-                    quantParams = fltArr.Count(),
-                    quantFilledParams = qemptyPars,
-                    quantFlats = rowHouse.Количество_квартир == "" ? 0 : Convert.ToInt32(rowHouse.Количество_квартир),
-                    quantNoFlats = rowHouse.Нежилых_помещений == "" ? 0 : Convert.ToInt32(rowHouse.Нежилых_помещений)
-                });
-            }
-            */
+                    DataSet1.ElHouseParamsRow[] paramsArr = (DataSet1.ElHouseParamsRow[])rowHouse.GetChildRows("ElHouseElHouseParams");
+                    DataSet1.ElHouseParamsRow[] fltArr = (DataSet1.ElHouseParamsRow[])paramsArr.Where(p => !rgx.IsMatch(p.Param)).ToArray(); //отрезаем типа "3. "
 
-            foreach (DataSet1.GilFondObjectRow gfoRow in ds.GilFondObject.Rows)
-            {
+                    fltArr = (DataSet1.ElHouseParamsRow[])paramsArr.Where(p => !p.Param.Contains("в том числе")).ToArray(); //и в том числе
 
-                repGFObj.Add(new repGilFondObj
+                    int qemptyPars = fltArr.Where(p => p.ParamValue != "").Count();
+
+                    repElHouses.Add(new repElHouse
+                    {
+                        ID = rowHouse.ID_ElHouse,
+                        Address = rowHouse.Адрес_дома,
+                        quantParams = fltArr.Count(),
+                        quantFilledParams = qemptyPars,
+                        quantFlats = rowHouse.Количество_квартир == "" ? 0 : Convert.ToInt32(rowHouse.Количество_квартир),
+                        quantNoFlats = rowHouse.Нежилых_помещений == "" ? 0 : Convert.ToInt32(rowHouse.Нежилых_помещений)
+                    });
+                }
+                */
+
+                DataSet1.LicenseRow LicenseCompany = null;
+                if (ds.License.Rows.Count > 0)
                 {
-                    ID_GilFondObject = gfoRow.ID_GilFondObject,
-                    ID_Audit = ActiveAudit.ID,
-                    ID_Company = ActiveAudit.ID_Company,
-                    Company = ActiveAudit.Company,
-                    Address = gfoRow.Адрес,
-                    quantGilPom = gfoRow._Кол_во_помещений.Split('/')[0] == "-" ? 0 : Convert.ToInt32(gfoRow._Кол_во_помещений.Split('/')[0]),
-                    quantNoGilPom = gfoRow._Кол_во_помещений.Split('/')[1] == "- " ? 0 : Convert.ToInt32(gfoRow._Кол_во_помещений.Split('/')[1])
-                });
+                    LicenseCompany = (DataSet1.LicenseRow)ds.License.Rows[0];
+                }
+                //для случая с ТСЖ
+                DataSet1.CompaniesRow ActiveCompany = ds.Companies.Where(c => c.ID == ActiveAudit.ID_Company).FirstOrDefault();
 
-
-                DataSet1.PorchGilFondОbjectsRow[] arr = (DataSet1.PorchGilFondОbjectsRow[])gfoRow.GetChildRows("GilFondObjectPorchGilFondОbjects");
-                foreach (DataSet1.PorchGilFondОbjectsRow porch in arr)
+                foreach (DataSet1.GilFondObjectRow gfoRow in ds.GilFondObject.Rows)
                 {
-                    DataSet1.PomeschGilFondОbsRow[] pomscharr = (DataSet1.PomeschGilFondОbsRow[])porch.GetChildRows("PorchGilFondОbjectsPomeschGilFondОbs");
-                    Console.WriteLine(pomscharr);
+                    repGFObj.Add(new repGilFondObj
+                    {
+                        ID_GilFondObject = gfoRow.ID_GilFondObject,
+                        ID_Audit = ActiveAudit.ID,
+                        ID_Company = ActiveAudit.ID_Company,
+
+                        CompanyName = LicenseCompany != null ? LicenseCompany.Лицензиат : ActiveAudit.Company,
+                        CompanyAddress = LicenseCompany != null ? LicenseCompany.Адрес : "???",
+                        CompanyINN = LicenseCompany != null ? LicenseCompany.ИНН : ActiveCompany.INN,
+                        CompanyLicense = LicenseCompany != null ? LicenseCompany.Лицензия : "????",
+
+                        Address = gfoRow.Адрес,
+                        quantGilPom = gfoRow._Кол_во_помещений.Split('/')[0] == "-" ? 0 : Convert.ToInt32(gfoRow._Кол_во_помещений.Split('/')[0]),
+                        quantNoGilPom = gfoRow._Кол_во_помещений.Split('/')[1] == "- " ? 0 : Convert.ToInt32(gfoRow._Кол_во_помещений.Split('/')[1])
+                    });
+
+                    DataSet1.PorchGilFondОbjectsRow[] arr = (DataSet1.PorchGilFondОbjectsRow[])gfoRow.GetChildRows("GilFondObjectPorchGilFondОbjects");
+                    foreach (DataSet1.PorchGilFondОbjectsRow porch in arr)
+                    {
+                        DataSet1.PomeschGilFondОbsRow[] pomscharr = (DataSet1.PomeschGilFondОbsRow[])porch.GetChildRows("PorchGilFondОbjectsPomeschGilFondОbs");
+                        // Console.WriteLine(pomscharr);
+                    }
+
                 }
 
-                Console.WriteLine(arr);
+                //Лицевые счета
+                licSchetAdapter.FillByActiveAudit(ds.LicSchet, ActiveAudit.ID, ActiveAudit.ID_Company);
+                DataSet1.LicSchetRow[] lsArr = ds.LicSchet.ToArray();
+                int quantLS = lsArr.Count(); //общее кол-во ЛС
+                                             //???? DateTime tls = Convert.ToDateTime(lsArr.Max(l => Convert.ToDateTime(l.Дата_события))); //Макс дата выгрузки ЛС
+
+                //Перечень работ и услуг
+                pereschRabUslAdapter.FillByActiveAudit(ds.PerechRabUslug, ActiveAudit.ID, ActiveAudit.ID_Company);
+                DataSet1.PerechRabUslugRow[] perArr = ds.PerechRabUslug.ToArray();
+
+                //Голосования
+                votingAdapter.FillByActiveAudit(ds.Voting, ActiveAudit.ID, ActiveAudit.ID_Company);
+                DataSet1.VotingRow[] votingArr = ds.Voting.ToArray();
+
+                DataSet1.qrLicSchet_PlatDocsRow[] qrLSDocsArr = ds.qrLicSchet_PlatDocs.ToArray();
+
+                foreach (repGilFondObj gfo in repGFObj)
+                {
+                    gfo.quantPribor = QuantPriborByHouse(priborArr, gfo.Address);
+
+                    if (!ActiveAudit.Company.StartsWith("ТСЖ") && !ActiveAudit.Company.StartsWith("ЖСК") && !ActiveAudit.Company.StartsWith("ТСН"))
+                    {
+                        Tuple<string, string> dates = DatesByLicensyAndDogUpr(licHouseArr, doguprArr, gfo.Address);
+                        gfo.BeginDateByLic = dates.Item1;
+                        gfo.BeginDateByDogUpr = dates.Item2;
+                    }
+
+                    if (ActiveAudit.Company.StartsWith("ТСЖ") || ActiveAudit.Company.StartsWith("ЖСК") || ActiveAudit.Company.StartsWith("ТСН"))
+                    {
+                        ustavHouseAdapter.FillByCurrentAudit(ds.UstavHouse, ActiveAudit.ID);
+                        DataSet1.UstavHouseRow[] ustavHousesArr = ds.UstavHouse.ToArray();
+
+                        DataSet1.UstavHouseRow uhrow = ustavHousesArr.Where(h => h.Адрес == gfo.Address).FirstOrDefault();
+
+                        gfo.BeginDateByLic = "отсутствует";
+
+                        if (uhrow != null)
+                        {
+                            gfo.BeginDateByDogUpr = uhrow.Период;
+                        }
+                        else
+                        {
+                            gfo.BeginDateByDogUpr = "-";
+                        }
+                    }
+
+                    DataSet1.PerechRabUslugRow x = perArr.Where(p => p.Адрес == gfo.Address).FirstOrDefault();
+                    if (x != null)
+                    {
+                        gfo.perechRabUsl = x.Перечень;
+                    }
+                    else
+                    {
+                        gfo.perechRabUsl = "отсутствует";
+                    }
+
+                    Tuple<int, DateTime?> ls = LS_Quant_Date(lsArr, gfo.Address); //Кол-во и дата ЛС по объекту
+                    gfo.quantLS = ls.Item1;
+                    gfo.maxDateLS = ls.Item2;
+
+                    Tuple<int, DateTime?> vot = Voting_Qiant_Date(votingArr, gfo.Address);
+                    gfo.quantVoting = vot.Item1;
+                    gfo.maxDateVoting = vot.Item2;
+
+                    //////// Платежные док-ты со статусами Размещен и Проект
+                    gfo.quantPlatDocsRazm = qrLSDocsArr
+                        .Where(d => !d.IsСтатус_документаNull())
+                        .Where(d => d.Адрес.Contains(gfo.Address))
+                        .Where(s => s.Статус_документа == "Размещен")
+                        .Count();
+
+                    gfo.quantPlatDocsNoRazm = qrLSDocsArr
+                        .Where(d => !d.IsСтатус_документаNull())
+                        .Where(d => d.Адрес.Contains(gfo.Address))
+                        .Where(s => s.Статус_документа == "Проект")
+                        .Count();
+                }
+
+                frmReport ft = new frmReport(repGFObj);
+                ft.Show();
+
             }
-
-            //int quantLS = licSchetAdapter.GetDataByActiveAudit(ActiveAudit.ID, ActiveAudit.ID_Company).Count();
-            //DataRowCollection LSColl = licSchetAdapter.GetDataByActiveAudit(ActiveAudit.ID, ActiveAudit.ID_Company).Rows;
-
-
-            //Лицевые счета
-            licSchetAdapter.FillByActiveAudit(ds.LicSchet, ActiveAudit.ID, ActiveAudit.ID_Company);
-            DataSet1.LicSchetRow[] lsArr = ds.LicSchet.ToArray();
-            int quantLS = lsArr.Count(); //общее кол-во ЛС
-                                         //???? DateTime tls = Convert.ToDateTime(lsArr.Max(l => Convert.ToDateTime(l.Дата_события))); //Макс дата выгрузки ЛС
-
-            //Перечень работ и услуг
-            pereschRabUslAdapter.FillByActiveAudit(ds.PerechRabUslug, ActiveAudit.ID, ActiveAudit.ID_Company);
-            DataSet1.PerechRabUslugRow[] perArr = ds.PerechRabUslug.ToArray();
-
-            //Голосования
-            votingAdapter.FillByActiveAudit(ds.Voting, ActiveAudit.ID, ActiveAudit.ID_Company);
-            DataSet1.VotingRow[] votingArr = ds.Voting.ToArray();
-
-            DataSet1.qrLicSchet_PlatDocsRow[] qrLSDocsArr = ds.qrLicSchet_PlatDocs.ToArray();
-
-            foreach (repGilFondObj gfo in repGFObj)
+            catch (Exception ex)
             {
-                DataSet1.PerechRabUslugRow x = perArr.Where(p => p.Адрес == gfo.Address).FirstOrDefault();
-                if (x != null)
-                {
-                    gfo.perechRabUsl = x.Перечень;
-                }
-                else
-                {
-                    gfo.perechRabUsl = "отсутствует";
-                }
-
-                Tuple<int, DateTime> ls = LS_Quant_Date(lsArr, gfo.Address); //Кол-во и дата ЛС по объекту
-                gfo.quantLS = ls.Item1;
-                gfo.maxDateLS = ls.Item2;
-
-                Tuple<int, DateTime?> vot = Voting_Qiant_Date(votingArr, gfo.Address);
-                gfo.quantVoting = vot.Item1;
-                gfo.maxDateVoting = vot.Item2;
-
-                //////// Платежные док-ты со статусами Размещен и Проект
-                gfo.quantPlatDocsRazm = qrLSDocsArr
-                    .Where(d => !d.IsСтатус_документаNull())
-                    .Where(d => d.Адрес.Contains(gfo.Address))
-                    .Where(s => s.Статус_документа == "Размещен")
-                    .Count();
-
-                gfo.quantPlatDocsNoRazm = qrLSDocsArr
-                    .Where(d => !d.IsСтатус_документаNull())
-                    .Where(d => d.Адрес.Contains(gfo.Address))
-                    .Where(s => s.Статус_документа == "Проект")
-                    .Count();
+                MessageBox.Show(ex.Message);
             }
+            finally
+            {
+                Cursor.Current = Cursors.Default;
+            }
+        }
 
-            Console.WriteLine(repGFObj);
-            // Console.WriteLine(repElHouses);
+        //Даты начала по лицензии и договору
+        private Tuple<string, string> DatesByLicensyAndDogUpr(DataSet1.LicenseHousesRow[] licHouseArr, DataSet1.DogUpravlRow[] doguprArr, string addr)
+        {
+            IEnumerable<DataSet1.LicenseHousesRow> lhouses = licHouseArr.Where(d => d.Адрес == addr);
+            IEnumerable<DataSet1.DogUpravlRow> doguprhouses = doguprArr.Where(d => d.Управляемые_объекты == addr);
 
-            frmReport ft = new frmReport(repGFObj);
-            ft.Show();
+            string DateByLic = lhouses.Count() == 0 ? "-" : lhouses.FirstOrDefault().Начало_периода;
+            string DateByDog = doguprhouses.Count() == 0 ? "-" : doguprhouses.FirstOrDefault().Дата_вступления;
+
+            return Tuple.Create(DateByLic, DateByDog);
         }
 
         //кол-во и max дата лицевых счетов
-        private Tuple<int, DateTime> LS_Quant_Date(DataSet1.LicSchetRow[] lsarr, string addr)
+        private Tuple<int, DateTime?> LS_Quant_Date(DataSet1.LicSchetRow[] lsarr, string addr)
         {
-            DataSet1.LicSchetRow[] lsbyGFO = lsarr.Where(l => l.Адрес.Contains(addr)).ToArray();   //Кол-во лс по объекту   
-            DateTime tls = Convert.ToDateTime(lsbyGFO.Max(l => Convert.ToDateTime(l.Дата_события))); //Макс дата выгрузки ЛС
+            DataSet1.LicSchetRow[] lsbyGFO = lsarr.Where(l => l.Адрес.Contains(addr)).ToArray();   //Кол-во лс по объекту 
+            DateTime? tls = null;
 
-            return Tuple.Create(lsbyGFO.Count(),
-                tls);
+            if (lsbyGFO.Count() > 0)
+            {
+                tls = Convert.ToDateTime(lsbyGFO.Max(l => Convert.ToDateTime(l.Дата_события))); //Макс дата выгрузки ЛС
+                return Tuple.Create(lsbyGFO.Count(), tls);
+            }
+            else
+            {
+                return Tuple.Create(0, tls);
+            }
         }
 
+
+        private int QuantPriborByHouse(DataSet1.PriborRow[] pribArr, string addr)
+        {
+            int qp;
+            DataSet1.PriborRow[] prArr = pribArr.Where(p => p.Адрес.Contains(addr)).ToArray();
+            qp = prArr.Count();
+            return qp;
+        }
 
         //кол-во и max дата голосований
         private Tuple<int, DateTime?> Voting_Qiant_Date(DataSet1.VotingRow[] votingarr, string addr)
         {
-
-            addr = addr.Replace("г ", "г. ");
-            addr = addr.Replace("п ", "п. ");
-            addr = addr.Replace("ш ", "ш. ");
-            addr = addr.Replace("ул ", "ул. ");
-            addr = addr.Replace("пр-кт ", "пр-кт. ");
-            addr = addr.Replace("пер ", "пер. ");
-            addr = addr.Replace("обл Челябинская", "Челябинская обл");
-
-
             DateTime? tvot;
             DataSet1.VotingRow[] votingbyGFO = votingarr.Where(v => v.Адрес_дома == addr).ToArray(); //Кол-во голосований по объекту   
             if (votingbyGFO.Count() > 0)
@@ -375,6 +467,10 @@ namespace Gaudit
 
                 rabuslAdapter.Fill(ds.PerechRabUslug);
                 DataSet1.PerechRabUslugRow[] rabuslArr = ds.PerechRabUslug.ToArray();
+
+                ustavHouseAdapter.Fill(ds.UstavHouse);
+                DataSet1.UstavHouseRow[] ustavHouseArr = ds.UstavHouse.ToArray();
+
 
                 foreach (DataSet1.VotingRow dr in votingArr)
                 {
@@ -411,6 +507,12 @@ namespace Gaudit
                 }
                 ds.AcceptChanges();
 
+                foreach (DataSet1.UstavHouseRow dr in ustavHouseArr)
+                {
+                    string addr = ReplAddr(dr.Адрес);
+                    ustavHouseAdapter.UpdateAddress(addr, dr.ID_UstavHouse);
+                }
+                ds.AcceptChanges();
             }
             catch (Exception ex)
             {
@@ -430,7 +532,11 @@ namespace Gaudit
                     .Replace("пр-кт. ", "пр-кт ")
                     .Replace("б-р. ", "б-р ")
                     .Replace("проезд. ", "проезд ")
-                    .Replace("ш. ", "ш ");
+                    .Replace("ш. ", "ш ")
+                    .Replace("р-н. ", "р-н ")
+                    .Replace("п. ", "п ");
+
+            res = res.Trim();
 
             return res;
         }

@@ -54,7 +54,15 @@ namespace Gaudit
 
         private void договорыУправленияToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            ShowForm(typeof(DogUpravl));
+            if (ActiveAudit.Company.StartsWith("ТСЖ") || ActiveAudit.Company.StartsWith("ЖСК") || ActiveAudit.Company.StartsWith("ТСН"))
+            {
+                ShowForm(typeof(TsgUstav));
+            }
+            else
+            {
+                ShowForm(typeof(DogUpravl));
+            }
+
         }
 
         private void работыИУслугиToolStripMenuItem_Click(object sender, EventArgs e)

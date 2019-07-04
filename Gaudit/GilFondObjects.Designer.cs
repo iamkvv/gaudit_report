@@ -111,6 +111,7 @@
             this.btnDelete.Text = "Удалить выбранный объект";
             this.btnDelete.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
             this.btnDelete.UseVisualStyleBackColor = true;
+            this.btnDelete.Click += new System.EventHandler(this.btnDelete_Click);
             // 
             // btnGetSave
             // 
@@ -173,7 +174,7 @@
             this.tabPage11.Controls.Add(this.btnGetPorch);
             this.tabPage11.Location = new System.Drawing.Point(4, 22);
             this.tabPage11.Name = "tabPage11";
-            this.tabPage11.Size = new System.Drawing.Size(1063, 549);
+            this.tabPage11.Size = new System.Drawing.Size(1115, 525);
             this.tabPage11.TabIndex = 5;
             this.tabPage11.Text = "Подъезды и помещения";
             // 
@@ -273,6 +274,7 @@
             this.btnDeletePorch.Text = "Удалить выбранный подъезд";
             this.btnDeletePorch.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
             this.btnDeletePorch.UseVisualStyleBackColor = true;
+            this.btnDeletePorch.Click += new System.EventHandler(this.btnDeletePorch_Click);
             // 
             // btnGetPorch
             // 

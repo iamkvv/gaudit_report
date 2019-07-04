@@ -38,6 +38,7 @@
             this.объектыУправленияToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.лицензииToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.паспортаМКДToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.объектыЖилфондаToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.договорыУправленияToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.платежныеДокументыToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.реестрыToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -50,7 +51,6 @@
             this.stsMainStrip = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripStatusLabel2 = new System.Windows.Forms.ToolStripStatusLabel();
-            this.объектыЖилфондаToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.stsMainStrip.SuspendLayout();
             this.SuspendLayout();
@@ -122,28 +122,35 @@
             // лицензииToolStripMenuItem
             // 
             this.лицензииToolStripMenuItem.Name = "лицензииToolStripMenuItem";
-            this.лицензииToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
+            this.лицензииToolStripMenuItem.Size = new System.Drawing.Size(248, 22);
             this.лицензииToolStripMenuItem.Text = "Лицензии";
             this.лицензииToolStripMenuItem.Click += new System.EventHandler(this.лицензииToolStripMenuItem_Click);
             // 
             // паспортаМКДToolStripMenuItem
             // 
             this.паспортаМКДToolStripMenuItem.Name = "паспортаМКДToolStripMenuItem";
-            this.паспортаМКДToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
+            this.паспортаМКДToolStripMenuItem.Size = new System.Drawing.Size(248, 22);
             this.паспортаМКДToolStripMenuItem.Text = "Паспорта МКД";
             this.паспортаМКДToolStripMenuItem.Click += new System.EventHandler(this.паспортаМКДToolStripMenuItem_Click);
+            // 
+            // объектыЖилфондаToolStripMenuItem
+            // 
+            this.объектыЖилфондаToolStripMenuItem.Name = "объектыЖилфондаToolStripMenuItem";
+            this.объектыЖилфондаToolStripMenuItem.Size = new System.Drawing.Size(248, 22);
+            this.объектыЖилфондаToolStripMenuItem.Text = "Объекты жилфонда";
+            this.объектыЖилфондаToolStripMenuItem.Click += new System.EventHandler(this.объектыЖилфондаToolStripMenuItem_Click);
             // 
             // договорыУправленияToolStripMenuItem
             // 
             this.договорыУправленияToolStripMenuItem.Name = "договорыУправленияToolStripMenuItem";
-            this.договорыУправленияToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
-            this.договорыУправленияToolStripMenuItem.Text = "Договоры управления";
+            this.договорыУправленияToolStripMenuItem.Size = new System.Drawing.Size(248, 22);
+            this.договорыУправленияToolStripMenuItem.Text = "Уставы / Договоры управления";
             this.договорыУправленияToolStripMenuItem.Click += new System.EventHandler(this.договорыУправленияToolStripMenuItem_Click);
             // 
             // платежныеДокументыToolStripMenuItem
             // 
             this.платежныеДокументыToolStripMenuItem.Name = "платежныеДокументыToolStripMenuItem";
-            this.платежныеДокументыToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
+            this.платежныеДокументыToolStripMenuItem.Size = new System.Drawing.Size(248, 22);
             this.платежныеДокументыToolStripMenuItem.Text = "Платежные документы";
             this.платежныеДокументыToolStripMenuItem.Click += new System.EventHandler(this.платежныеДокументыToolStripMenuItem_Click);
             // 
@@ -224,13 +231,6 @@
             this.toolStripStatusLabel2.Padding = new System.Windows.Forms.Padding(10);
             this.toolStripStatusLabel2.Size = new System.Drawing.Size(65, 35);
             this.toolStripStatusLabel2.Text = "Вторая";
-            // 
-            // объектыЖилфондаToolStripMenuItem
-            // 
-            this.объектыЖилфондаToolStripMenuItem.Name = "объектыЖилфондаToolStripMenuItem";
-            this.объектыЖилфондаToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
-            this.объектыЖилфондаToolStripMenuItem.Text = "Объекты жилфонда";
-            this.объектыЖилфондаToolStripMenuItem.Click += new System.EventHandler(this.объектыЖилфондаToolStripMenuItem_Click);
             // 
             // MainForm
             // 

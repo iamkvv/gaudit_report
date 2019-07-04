@@ -21,15 +21,21 @@ namespace Gaudit
     }
 
     /// <summary>
-    /// Объекты жилого фонда (отчет)
+    /// Dataset для отчета
     /// </summary>
     public class repGilFondObj
     {
         public int ID_GilFondObject { get; set; } //Id дома 
         public int ID_Audit { get; set; } // 
-        public int ID_Company { get; set; } //
+        public int ID_Company { get; set; } // по справочнику компания
 
-        public string Company { get; set; } // Адрес
+        public string CompanyLicense { get; set; } // № Лицензии
+        public string CompanyAddress { get; set; } // Адрес
+        public string CompanyName { get; set; } // Название
+        public string CompanyINN { get; set; } // ИНН
+
+        public string BeginDateByLic { get; set;} //Дата начала по лицензии
+        public string BeginDateByDogUpr { get; set; } //Дата начала по договору управления
 
         public string Address { get; set; } // Адрес
         public int quantGilPom { get; set; } //кол-во жил пом-й
@@ -37,6 +43,8 @@ namespace Gaudit
         public int quantLS { get; set; } //кол-во лиц. счетов
         public DateTime? maxDateLS { get; set; } //макс дата вызгузки лиц. счетов
         public int quantVoting { get; set; } //кол-во голосований
+        public int quantPribor { get; set; } //кол-во приборов
+
         public DateTime? maxDateVoting { get; set; } //макс дата выгрузки голосований
 
         public string perechRabUsl { get; set; } //Перечень работ и услуг
@@ -60,6 +68,7 @@ namespace Gaudit
         public static string Name { get; set; }
         public static int ID_Company { get; set; }
         public static string Company { get; set; }
+        public static string INN { get; set; }
         public static DateTime Date { get; set; }
 
         public static void Clear()
@@ -68,6 +77,7 @@ namespace Gaudit
             Name = null;
             ID_Company = 0;
             Company = null;
+            INN = null;
             Date = DateTime.Now;
         }
 

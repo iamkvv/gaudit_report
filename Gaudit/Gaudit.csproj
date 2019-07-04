@@ -24,7 +24,7 @@
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
     <InstallUrl>\\192.168.0.55\GauditInstall\</InstallUrl>
-    <ApplicationRevision>14</ApplicationRevision>
+    <ApplicationRevision>19</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -214,6 +214,12 @@
     </Compile>
     <Compile Include="SqlServerTypes\Loader.cs" />
     <Compile Include="Status.cs" />
+    <Compile Include="TsgUstav.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TsgUstav.Designer.cs">
+      <DependentUpon>TsgUstav.cs</DependentUpon>
+    </Compile>
     <Compile Include="Voting.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -278,6 +284,9 @@
     </Compile>
     <EmbeddedResource Include="SelectDB.resx">
       <DependentUpon>SelectDB.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TsgUstav.resx">
+      <DependentUpon>TsgUstav.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Voting.resx">
       <DependentUpon>Voting.cs</DependentUpon>
